@@ -10,8 +10,8 @@
 </head>
 <body>
     <nav>
-        <a href="{% url 'library:book_list' %}">Library</a>
-        <div>
+        <a href="{% url 'library:book_list' %}" class="nav-brand">&#9679; Library</a>
+        <div class="nav-links">
             {% if user.is_authenticated %}
                 <a href="{% url 'library:book_list' %}">Books</a>
                 <a href="{% url 'library:my_loans' %}">My Loans</a>
@@ -19,8 +19,8 @@
                 <a href="{% url 'library:staff_book_list' %}">Manage Books</a>
                 <a href="{% url 'library:staff_loan_list' %}">All Loans</a>
                 {% endif %}
-                <span>{{ user.username }}</span>
-                <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                <span class="nav-username">{{ user.username }}</span>
+                <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="logout-btn">Logout</button>
                 </form>
@@ -40,6 +40,9 @@
         {% endif %}
         {% block content %}{% endblock %}
     </main>
+    <footer>
+        &copy; {% now "Y" %} Library Management System
+    </footer>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

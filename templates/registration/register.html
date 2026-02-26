@@ -3,19 +3,21 @@
 {% block title %}Register{% endblock %}
 
 {% block content %}
-<h1>Register</h1>
+<div class="auth-card">
+    <h1>Register</h1>
 
-{% if form.non_field_errors %}
-    <div class="errors">
-        {{ form.non_field_errors }}
-    </div>
-{% endif %}
+    {% if form.non_field_errors %}
+        <div class="errors">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register</button>
-</form>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" style="width:100%; margin-top:0.5rem;">Create Account</button>
+    </form>
 
-<p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+    <p class="auth-footer">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+</div>
 {% endblock %}
