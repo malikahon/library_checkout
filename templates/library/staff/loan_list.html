@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}All Loans{% endblock %}
+
+{% block content %}
+<h1>All Loans</h1>
+<p><a href="{% url 'library:staff_loan_assign' %}">Assign Loan</a></p>
+
+<p>
+    Filter:
+    <a href="{% url 'library:staff_loan_list' %}">All</a> |
+    <a href="{% url 'library:staff_loan_list' %}?status=active">Active</a> |
+    <a href="{% url 'library:staff_loan_list' %}?status=returned">Returned</a>
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Book</th>
+            <th>Member</th>
+            <th>Checked Out</th>
+            <th>Returned</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for loan in loans %}
+        <tr>
+            <td>{{ loan.book.title }}</td>
+            <td>{{ loan.member.username }}</td>
+            <td>{{ loan.checked_out_at }}</td>
+            <td>{{ loan.returned_at|default:"-" }}</td>
+            <td>{% if loan.is_active %}Active{% else %}Returned{% endif %}</td>
+            <td>
+                {% if loan.is_active %}
+                <form method="post" action="{% url 'library:staff_loan_force_return' loan.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Force Return</button>
+                </form>
+                {% else %}
+                -
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No loans found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

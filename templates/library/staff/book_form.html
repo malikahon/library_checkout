@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Edit Book{% else %}Add Book{% endif %}{% endblock %}
+
+{% block content %}
+<h1>{% if object %}Edit Book: {{ object.title }}{% else %}Add Book{% endif %}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <ul class="errors">
+        {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <button type="submit">{% if object %}Update Book{% else %}Add Book{% endif %}</button>
+    <a href="{% url 'library:staff_book_list' %}">Cancel</a>
+</form>
+{% endblock %}

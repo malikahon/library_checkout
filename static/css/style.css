@@ -1,0 +1,222 @@
+/* ===== Base Reset & Typography ===== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: #212529;
+    background-color: #f8f9fa;
+}
+
+a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ===== Navigation ===== */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background-color: #212529;
+    color: #fff;
+}
+
+nav a {
+    color: #ffffffcc;
+    margin-right: 1rem;
+    font-weight: 500;
+}
+
+nav a:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+nav span {
+    color: #adb5bd;
+    margin-right: 1rem;
+}
+
+/* ===== Main Content ===== */
+main {
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+h1 {
+    margin-bottom: 1rem;
+    font-size: 1.75rem;
+}
+
+h2 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.35rem;
+}
+
+p {
+    margin-bottom: 0.75rem;
+}
+
+/* ===== Messages (Django flash messages) ===== */
+ul.messages {
+    list-style: none;
+    margin-bottom: 1.5rem;
+}
+
+ul.messages li {
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    border: 1px solid transparent;
+}
+
+ul.messages li.success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border-color: #badbcc;
+}
+
+ul.messages li.error {
+    background-color: #f8d7da;
+    color: #842029;
+    border-color: #f5c2c7;
+}
+
+ul.messages li.warning {
+    background-color: #fff3cd;
+    color: #664d03;
+    border-color: #ffecb5;
+}
+
+ul.messages li.info {
+    background-color: #cff4fc;
+    color: #055160;
+    border-color: #b6effb;
+}
+
+/* ===== Tables ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    background-color: #fff;
+}
+
+th, td {
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+thead th {
+    background-color: #e9ecef;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+}
+
+tbody tr:hover {
+    background-color: #f1f3f5;
+}
+
+/* ===== Forms ===== */
+form {
+    margin-bottom: 1rem;
+}
+
+form p {
+    margin-bottom: 0.75rem;
+}
+
+form p label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* ===== Buttons ===== */
+button[type="submit"] {
+    display: inline-block;
+    padding: 0.5rem 1.25rem;
+    background-color: #0d6efd;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+button[type="submit"]:hover {
+    background-color: #0b5ed7;
+}
+
+/* ===== Logout Button (nav) ===== */
+nav form {
+    display: inline;
+    margin: 0;
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-right: 1rem;
+    color: #ffffffcc;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.logout-btn:hover {
+    color: #fff;
+    background: none;
+}
+
+/* ===== Error Lists ===== */
+.errors {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.errors ul {
+    list-style: none;
+}

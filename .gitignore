@@ -34,3 +34,4 @@ db.sqlite3-journal
 .DS_Store
 
 *.md
+staticfiles/
