@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Books{% endblock %}
+
+{% block content %}
+<h1>Book Catalogue</h1>
+
+{% if books %}
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Genres</th>
+            <th>Availability</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+        <tr>
+            <td><a href="{% url 'library:book_detail' book.pk %}">{{ book.title }}</a></td>
+            <td>{{ book.author }}</td>
+            <td>
+                {% for genre in book.genres.all %}
+                    {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                    —
+                {% endfor %}
+            </td>
+            <td>
+                {% if book.available_copies > 0 %}
+                    {{ book.available_copies }} / {{ book.total_copies }}
+                {% else %}
+                    <strong>Unavailable</strong> (0 / {{ book.total_copies }})
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No books in the catalogue yet.</p>
+{% endif %}
+{% endblock %}

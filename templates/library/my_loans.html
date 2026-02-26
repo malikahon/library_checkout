@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}My Loans{% endblock %}
+
+{% block content %}
+<h1>My Loans</h1>
+
+<h2>Active Loans</h2>
+{% if active_loans %}
+<table>
+    <thead>
+        <tr>
+            <th>Book</th>
+            <th>Checked Out</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for loan in active_loans %}
+        <tr>
+            <td><a href="{% url 'library:book_detail' loan.book.pk %}">{{ loan.book.title }}</a></td>
+            <td>{{ loan.checked_out_at|date:"N j, Y, P" }}</td>
+            <td>
+                <form method="post" action="{% url 'library:loan_return' loan.pk %}">
+                    {% csrf_token %}
+                    <button type="submit">Return</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>You have no active loans.</p>
+{% endif %}
+
+<h2>Loan History</h2>
+{% if past_loans %}
+<table>
+    <thead>
+        <tr>
+            <th>Book</th>
+            <th>Checked Out</th>
+            <th>Returned</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for loan in past_loans %}
+        <tr>
+            <td><a href="{% url 'library:book_detail' loan.book.pk %}">{{ loan.book.title }}</a></td>
+            <td>{{ loan.checked_out_at|date:"N j, Y, P" }}</td>
+            <td>{{ loan.returned_at|date:"N j, Y, P" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No past loans.</p>
+{% endif %}
+{% endblock %}
