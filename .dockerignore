@@ -1,0 +1,46 @@
+# Version control
+.git
+.gitignore
+
+# CI
+.github
+
+# Secrets — never bake into image
+.env
+.env.*
+
+# Python artifacts
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+.eggs
+
+# Local database
+db.sqlite3
+
+# collectstatic output — rebuilt at container startup
+staticfiles/
+
+# Documentation
+*.md
+
+# Tests — not needed in production image
+tests/
+pytest.ini
+
+# Docker files — not needed inside image
+docker-compose*.yml
+Dockerfile*
+
+# Editor artifacts
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS artifacts
+Thumbs.db
