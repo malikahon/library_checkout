@@ -51,15 +51,27 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - static_files:/app/staticfiles:ro
       - media_files:/app/mediafiles:ro
-      - ssl_certs:/etc/nginx/ssl
+      - letsencrypt:/etc/letsencrypt:ro
+      - certbot_webroot:/var/www/certbot:ro
     depends_on:
       - web
     networks:
       - backend
-    # Generate a self-signed cert into the ssl_certs volume on first start,
-    # then hand off to the real nginx process.
-    command: |
-      sh -c "apk add --no-cache openssl && if [ ! -f /etc/nginx/ssl/cert.pem ]; then mkdir -p /etc/nginx/ssl && openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/key.pem -out /etc/nginx/ssl/cert.pem -subj '/C=US/ST=State/L=City/O=Org/CN=localhost'; fi && nginx -g 'daemon off;'"
+
+  # ---------------------------------------------------------------------------
+  # Certbot — obtains and renews Let's Encrypt TLS certificates
+  # ---------------------------------------------------------------------------
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot_webroot:/var/www/certbot
+    # Attempt renewal every 12 hours; exits immediately if not due
+    entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done"
+    depends_on:
+      - nginx
+    networks:
+      - backend
 
 # ---------------------------------------------------------------------------
 # Named volumes
@@ -68,7 +80,8 @@ volumes:
   postgres_data:
   static_files:
   media_files:
-  ssl_certs:
+  letsencrypt:
+  certbot_webroot:
 
 # ---------------------------------------------------------------------------
 # Networks — isolated bridge; only nginx is externally reachable
