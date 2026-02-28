@@ -7,8 +7,6 @@ import pytest
 from django.contrib.auth.models import User
 from django.urls import reverse
 
-from library.models import Loan
-
 
 # ---------------------------------------------------------------------------
 # Staff-only route protection

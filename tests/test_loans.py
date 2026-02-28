@@ -6,7 +6,7 @@ zero-availability rejection, and the my-loans view.
 import pytest
 from django.urls import reverse
 
-from library.models import Book, Loan
+from library.models import Loan
 
 
 @pytest.mark.django_db
@@ -114,7 +114,7 @@ class TestMyLoans:
         active_loan.save(update_fields=['is_active', 'returned_at'])
 
         # Create a new active loan
-        new_loan = Loan.objects.create(member=member_user, book=book)
+        Loan.objects.create(member=member_user, book=book)
 
         client.force_login(member_user)
         url = reverse('library:my_loans')

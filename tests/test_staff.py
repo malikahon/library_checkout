@@ -105,7 +105,7 @@ class TestStaffLoanAssign:
             'member': member_user.pk,
             'book': book.pk,
         }
-        response = client.post(url, data)
+        client.post(url, data)
 
         # The form-level clean() should catch this and re-render or redirect
         assert Loan.objects.filter(

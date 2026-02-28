@@ -5,7 +5,7 @@ Tests for form validation: BookForm and AssignLoanForm.
 import pytest
 
 from library.forms import AssignLoanForm, BookForm
-from library.models import Genre, Loan
+from library.models import Genre  # noqa: F401 — used by fixtures indirectly
 
 
 @pytest.mark.django_db
