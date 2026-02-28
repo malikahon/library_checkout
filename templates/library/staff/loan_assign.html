@@ -3,21 +3,29 @@
 {% block title %}Assign Loan{% endblock %}
 
 {% block content %}
-<h1>Assign Loan</h1>
+<a href="{% url 'library:staff_loan_list' %}" class="back-link">Back to loans</a>
 
-<form method="post">
-    {% csrf_token %}
-    {% if form.non_field_errors %}
-    <ul class="errors">
-        {% for error in form.non_field_errors %}
-        <li>{{ error }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    <table>
-        {{ form.as_table }}
-    </table>
-    <button type="submit">Assign Loan</button>
-    <a href="{% url 'library:staff_loan_list' %}">Cancel</a>
-</form>
+<div class="page-header">
+    <h1>Assign Loan</h1>
+</div>
+
+<div class="form-card">
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="errors">
+            {% for error in form.non_field_errors %}
+            <p style="margin:0">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <table>
+            {{ form.as_table }}
+        </table>
+        <div style="display:flex; gap:0.75rem; margin-top:1rem; align-items:center;">
+            <button type="submit">Assign Loan</button>
+            <a href="{% url 'library:staff_loan_list' %}" class="btn btn-ghost">Cancel</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

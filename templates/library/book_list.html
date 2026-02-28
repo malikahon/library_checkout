@@ -3,42 +3,44 @@
 {% block title %}Books{% endblock %}
 
 {% block content %}
-<h1>Book Catalogue</h1>
+<div class="page-header">
+    <h1>Book Catalogue</h1>
+</div>
 
 {% if books %}
-<table>
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Genres</th>
-            <th>Availability</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for book in books %}
-        <tr>
-            <td><a href="{% url 'library:book_detail' book.pk %}">{{ book.title }}</a></td>
-            <td>{{ book.author }}</td>
-            <td>
-                {% for genre in book.genres.all %}
-                    {{ genre.name }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                    —
-                {% endfor %}
-            </td>
-            <td>
-                {% if book.available_copies > 0 %}
-                    {{ book.available_copies }} / {{ book.total_copies }}
-                {% else %}
-                    <strong>Unavailable</strong> (0 / {{ book.total_copies }})
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="book-grid">
+    {% for book in books %}
+    <a href="{% url 'library:book_detail' book.pk %}" class="book-card">
+        <div class="book-card-title">{{ book.title }}</div>
+        <div class="book-card-author">{{ book.author }}</div>
+        {% if book.genres.all %}
+        <div class="book-card-genres">
+            {% for genre in book.genres.all %}
+                <span class="badge badge-genre">{{ genre.name }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="book-card-footer">
+            {% if book.available_copies > 0 %}
+                <span class="avail-indicator">
+                    <span class="avail-dot green"></span>
+                    <span>Available</span>
+                    <span class="avail-count">({{ book.available_copies }}/{{ book.total_copies }})</span>
+                </span>
+            {% else %}
+                <span class="avail-indicator">
+                    <span class="avail-dot red"></span>
+                    <span style="color:#fca5a5;">Unavailable</span>
+                    <span class="avail-count">(0/{{ book.total_copies }})</span>
+                </span>
+            {% endif %}
+        </div>
+    </a>
+    {% endfor %}
+</div>
 {% else %}
-<p>No books in the catalogue yet.</p>
+<div class="empty-state">
+    <p>No books in the catalogue yet.</p>
+</div>
 {% endif %}
 {% endblock %}

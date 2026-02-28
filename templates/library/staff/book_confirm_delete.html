@@ -3,12 +3,18 @@
 {% block title %}Delete Book{% endblock %}
 
 {% block content %}
-<h1>Delete Book</h1>
-<p>Are you sure you want to delete <strong>{{ object.title }}</strong> by {{ object.author }}?</p>
+<a href="{% url 'library:staff_book_list' %}" class="back-link">Back to books</a>
 
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Confirm Delete</button>
-    <a href="{% url 'library:staff_book_list' %}">Cancel</a>
-</form>
+<div class="page-header">
+    <h1>Delete Book</h1>
+</div>
+
+<div class="danger-card">
+    <p>Are you sure you want to delete <strong>{{ object.title }}</strong> by {{ object.author }}? This action cannot be undone.</p>
+    <form method="post" style="display:flex; gap:0.75rem; align-items:center;">
+        {% csrf_token %}
+        <button type="submit" class="btn-danger">Confirm Delete</button>
+        <a href="{% url 'library:staff_book_list' %}" class="btn btn-ghost">Cancel</a>
+    </form>
+</div>
 {% endblock %}

@@ -23,4 +23,7 @@ urlpatterns = [
     path('staff/loans/', views.StaffLoanListView.as_view(), name='staff_loan_list'),
     path('staff/loans/assign/', views.StaffLoanAssignView.as_view(), name='staff_loan_assign'),
     path('staff/loans/<int:pk>/force-return/', views.StaffForceReturnView.as_view(), name='staff_loan_force_return'),
+
+    # Staff URLs — User Management
+    path('staff/users/', views.StaffUserListView.as_view(), name='staff_user_list'),
 ]

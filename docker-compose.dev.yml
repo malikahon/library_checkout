@@ -1,0 +1,59 @@
+services:
+
+  # ---------------------------------------------------------------------------
+  # Database — PostgreSQL 16 (separate volume from production)
+  # ---------------------------------------------------------------------------
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME:-library_db}
+      POSTGRES_USER: ${DB_USER:-library_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-library_pass}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-library_user} -d ${DB_NAME:-library_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Web — Django development server with live code reload
+  # ---------------------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - DEBUG=True
+      - DB_HOST=db
+      - DB_PORT=5432
+    volumes:
+      # Bind mount — changes to source code are reflected immediately
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    # Override the production entrypoint: run migrate then use Django's
+    # development server instead of Gunicorn (no collectstatic needed).
+    entrypoint: []
+    command: >
+      sh -c "
+        python manage.py migrate --noinput &&
+        python manage.py runserver 0.0.0.0:8000
+      "
+
+# ---------------------------------------------------------------------------
+# Volumes — separate from production to avoid data conflicts
+# ---------------------------------------------------------------------------
+volumes:
+  postgres_data_dev:

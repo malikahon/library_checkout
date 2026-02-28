@@ -3,15 +3,18 @@
 {% block title %}My Loans{% endblock %}
 
 {% block content %}
-<h1>My Loans</h1>
+<div class="page-header">
+    <h1>My Loans</h1>
+</div>
 
-<h2>Active Loans</h2>
+<div class="section-title">Active Loans</div>
 {% if active_loans %}
 <table>
     <thead>
         <tr>
             <th>Book</th>
             <th>Checked Out</th>
+            <th>Status</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -20,8 +23,9 @@
         <tr>
             <td><a href="{% url 'library:book_detail' loan.book.pk %}">{{ loan.book.title }}</a></td>
             <td>{{ loan.checked_out_at|date:"N j, Y, P" }}</td>
+            <td><span class="badge badge-active">Active</span></td>
             <td>
-                <form method="post" action="{% url 'library:loan_return' loan.pk %}">
+                <form method="post" action="{% url 'library:loan_return' loan.pk %}" class="inline-form">
                     {% csrf_token %}
                     <button type="submit">Return</button>
                 </form>
@@ -31,10 +35,12 @@
     </tbody>
 </table>
 {% else %}
-<p>You have no active loans.</p>
+<div class="empty-state">
+    <p>You have no active loans.</p>
+</div>
 {% endif %}
 
-<h2>Loan History</h2>
+<div class="section-title">Loan History</div>
 {% if past_loans %}
 <table>
     <thead>
@@ -42,6 +48,7 @@
             <th>Book</th>
             <th>Checked Out</th>
             <th>Returned</th>
+            <th>Status</th>
         </tr>
     </thead>
     <tbody>
@@ -50,11 +57,14 @@
             <td><a href="{% url 'library:book_detail' loan.book.pk %}">{{ loan.book.title }}</a></td>
             <td>{{ loan.checked_out_at|date:"N j, Y, P" }}</td>
             <td>{{ loan.returned_at|date:"N j, Y, P" }}</td>
+            <td><span class="badge badge-returned">Returned</span></td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 {% else %}
-<p>No past loans.</p>
+<div class="empty-state">
+    <p>No past loans.</p>
+</div>
 {% endif %}
 {% endblock %}

@@ -3,15 +3,17 @@
 {% block title %}All Loans{% endblock %}
 
 {% block content %}
-<h1>All Loans</h1>
-<p><a href="{% url 'library:staff_loan_assign' %}">Assign Loan</a></p>
+<div class="page-header">
+    <h1>All Loans</h1>
+    <a href="{% url 'library:staff_loan_assign' %}" class="action-btn">Assign Loan</a>
+</div>
 
-<p>
-    Filter:
-    <a href="{% url 'library:staff_loan_list' %}">All</a> |
-    <a href="{% url 'library:staff_loan_list' %}?status=active">Active</a> |
-    <a href="{% url 'library:staff_loan_list' %}?status=returned">Returned</a>
-</p>
+<div class="filter-bar">
+    <span class="filter-label">Filter:</span>
+    <a href="{% url 'library:staff_loan_list' %}" class="filter-pill {% if not request.GET.status %}active{% endif %}">All</a>
+    <a href="{% url 'library:staff_loan_list' %}?status=active" class="filter-pill {% if request.GET.status == 'active' %}active{% endif %}">Active</a>
+    <a href="{% url 'library:staff_loan_list' %}?status=returned" class="filter-pill {% if request.GET.status == 'returned' %}active{% endif %}">Returned</a>
+</div>
 
 <table>
     <thead>
@@ -27,25 +29,31 @@
     <tbody>
         {% for loan in loans %}
         <tr>
-            <td>{{ loan.book.title }}</td>
+            <td style="color:var(--text-primary); font-weight:500;">{{ loan.book.title }}</td>
             <td>{{ loan.member.username }}</td>
             <td>{{ loan.checked_out_at }}</td>
-            <td>{{ loan.returned_at|default:"-" }}</td>
-            <td>{% if loan.is_active %}Active{% else %}Returned{% endif %}</td>
+            <td>{{ loan.returned_at|default:"—" }}</td>
             <td>
                 {% if loan.is_active %}
-                <form method="post" action="{% url 'library:staff_loan_force_return' loan.pk %}" style="display:inline;">
+                    <span class="badge badge-active">Active</span>
+                {% else %}
+                    <span class="badge badge-returned">Returned</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if loan.is_active %}
+                <form method="post" action="{% url 'library:staff_loan_force_return' loan.pk %}" class="inline-form">
                     {% csrf_token %}
                     <button type="submit">Force Return</button>
                 </form>
                 {% else %}
-                -
+                <span style="color:var(--text-muted)">—</span>
                 {% endif %}
             </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="6">No loans found.</td>
+            <td colspan="6" style="text-align:center; color:var(--text-muted); padding:2rem;">No loans found.</td>
         </tr>
         {% endfor %}
     </tbody>
