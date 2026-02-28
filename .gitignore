@@ -36,5 +36,6 @@ nginx/ssl/
 .DS_Store
 
 *.md
+!README.md
 .pytest_cache/
 staticfiles/
