@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Manage Users</h1>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Date Joined</th>
+            <th>Active Loans</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for member in members %}
+        <tr>
+            <td style="color:var(--text-primary); font-weight:500;">{{ member.username }}</td>
+            <td>{{ member.email|default:"—" }}</td>
+            <td>{{ member.date_joined }}</td>
+            <td>{{ member.active_loan_count }}</td>
+            <td>
+                {% if member.is_active %}
+                    <span class="badge badge-active">Active</span>
+                {% else %}
+                    <span class="badge badge-unavailable">Inactive</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">No members found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

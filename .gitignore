@@ -26,6 +26,8 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 .env
+.env.*
+nginx/ssl/
 .idea/
 .vscode/
 *.swp
@@ -34,4 +36,5 @@ db.sqlite3-journal
 .DS_Store
 
 *.md
+.pytest_cache/
 staticfiles/

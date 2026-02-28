@@ -1,12 +1,21 @@
-{% extends "base.html" %}
-
-{% block title %}Server Error{% endblock %}
-
-{% block content %}
-<div class="error-page">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Error</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 4rem 1rem; background: #080d0b; color: #dff0e8; }
+        .error-code { font-size: 6rem; font-weight: bold; color: #047857; margin-bottom: 0; }
+        h1 { margin-top: 0.5rem; }
+        a { display: inline-block; margin-top: 1.5rem; padding: 0.6rem 1.4rem; background: #059669; color: #fff; border-radius: 4px; text-decoration: none; }
+        a:hover { background: #10b981; }
+    </style>
+</head>
+<body>
     <div class="error-code">500</div>
     <h1>Server Error</h1>
     <p>Something went wrong on our end. Please try again later.</p>
-    <a href="{% url 'library:book_list' %}" class="btn btn-primary">Return to Book List</a>
-</div>
-{% endblock %}
+    <a href="/">Return to Home</a>
+</body>
+</html>

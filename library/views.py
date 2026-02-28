@@ -1,7 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.auth.views import LoginView
 from django.db import IntegrityError, transaction
-from django.http import HttpResponseNotAllowed
+from django.db.models import Count, Q
+from django.http import Http404, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -12,6 +15,92 @@ from .forms import AssignLoanForm, BookForm, RegistrationForm
 from .mixins import StaffRequiredMixin
 from .models import Book, Loan
 
+
+# ---------------------------------------------------------------------------
+# Authentication
+# ---------------------------------------------------------------------------
+
+class CustomLoginView(LoginView):
+    template_name = 'registration/login.html'
+
+    def get_success_url(self):
+        # If there's an explicit ?next= parameter, honour it.
+        redirect_to = self.request.POST.get(
+            self.redirect_field_name,
+            self.request.GET.get(self.redirect_field_name, ''),
+        )
+        if redirect_to:
+            return redirect_to
+        # Staff users land on Manage Books; members land on the catalogue.
+        if self.request.user.is_staff:
+            return reverse_lazy('library:staff_book_list')
+        return reverse_lazy('library:book_list')
+
+
+# ---------------------------------------------------------------------------
+# Shared helpers
+# ---------------------------------------------------------------------------
+
+def _execute_checkout(member, book_pk):
+    """Atomically create a loan and decrement available copies.
+
+    Must be called inside a ``transaction.atomic()`` block.
+
+    Returns the created ``Loan`` on success.
+    Raises ``Book.DoesNotExist`` if the book is missing.
+    Raises ``ValueError`` with a user-friendly message on business-rule
+    violations (no copies available, duplicate active loan).
+    """
+    book = Book.objects.select_for_update().get(pk=book_pk)
+
+    if book.available_copies <= 0:
+        raise ValueError('No copies currently available.')
+
+    if Loan.objects.filter(member=member, book=book, is_active=True).exists():
+        raise ValueError('This member already has an active loan for this book.')
+
+    loan = Loan.objects.create(member=member, book=book)
+    book.available_copies -= 1
+    book.save(update_fields=['available_copies'])
+    return loan
+
+
+def _execute_return(loan_pk, *, scope_filter=None):
+    """Atomically deactivate a loan and restore the book copy.
+
+    Must be called inside a ``transaction.atomic()`` block.
+
+    ``scope_filter`` is an optional dict of extra ``.get()`` kwargs
+    (e.g. ``{'member': request.user}``) used to restrict which loans
+    the caller is allowed to return.
+
+    Returns the deactivated ``Loan``.
+    Raises ``Loan.DoesNotExist`` if no matching active loan is found.
+    """
+    lookup = {'pk': loan_pk, 'is_active': True}
+    if scope_filter:
+        lookup.update(scope_filter)
+
+    loan = (
+        Loan.objects
+        .select_for_update()
+        .select_related('book')
+        .get(**lookup)
+    )
+    book = Book.objects.select_for_update().get(pk=loan.book_id)
+
+    loan.is_active = False
+    loan.returned_at = timezone.now()
+    loan.save(update_fields=['is_active', 'returned_at'])
+
+    book.available_copies += 1
+    book.save(update_fields=['available_copies'])
+    return loan
+
+
+# ---------------------------------------------------------------------------
+# Public / Member Views
+# ---------------------------------------------------------------------------
 
 def register_view(request):
     if request.method == 'POST':
@@ -51,32 +140,17 @@ def book_checkout_view(request, pk):
 
     try:
         with transaction.atomic():
-            book = Book.objects.select_for_update().get(pk=pk)
-
-            if book.available_copies <= 0:
-                messages.error(request, 'No copies currently available.')
-                return redirect('library:book_detail', pk=pk)
-
-            if Loan.objects.filter(
-                member=request.user, book=book, is_active=True
-            ).exists():
-                messages.error(
-                    request, 'You already have this book checked out.'
-                )
-                return redirect('library:book_detail', pk=pk)
-
-            Loan.objects.create(member=request.user, book=book)
-            book.available_copies -= 1
-            book.save(update_fields=['available_copies'])
-
+            loan = _execute_checkout(request.user, pk)
     except Book.DoesNotExist:
-        from django.http import Http404
         raise Http404
+    except ValueError as exc:
+        messages.error(request, str(exc))
+        return redirect('library:book_detail', pk=pk)
     except IntegrityError:
         messages.error(request, 'You already have this book checked out.')
         return redirect('library:book_detail', pk=pk)
 
-    messages.success(request, f'You have checked out "{book.title}".')
+    messages.success(request, f'You have checked out "{loan.book.title}".')
     return redirect('library:book_detail', pk=pk)
 
 
@@ -87,26 +161,11 @@ def loan_return_view(request, pk):
 
     try:
         with transaction.atomic():
-            loan = (
-                Loan.objects
-                .select_for_update()
-                .select_related('book')
-                .get(pk=pk, member=request.user, is_active=True)
-            )
-            book = Book.objects.select_for_update().get(pk=loan.book_id)
-
-            loan.returned_at = timezone.now()
-            loan.is_active = False
-            loan.save(update_fields=['returned_at', 'is_active'])
-
-            book.available_copies += 1
-            book.save(update_fields=['available_copies'])
-
+            loan = _execute_return(pk, scope_filter={'member': request.user})
     except Loan.DoesNotExist:
-        from django.http import Http404
         raise Http404
 
-    messages.success(request, f'You have returned "{book.title}".')
+    messages.success(request, f'You have returned "{loan.book.title}".')
     return redirect('library:my_loans')
 
 
@@ -216,25 +275,10 @@ class StaffLoanAssignView(StaffRequiredMixin, FormView):
 
         try:
             with transaction.atomic():
-                book_locked = Book.objects.select_for_update().get(pk=book.pk)
-
-                if book_locked.available_copies <= 0:
-                    messages.error(self.request, 'No copies currently available.')
-                    return redirect('library:staff_loan_assign')
-
-                if Loan.objects.filter(
-                    member=member, book=book_locked, is_active=True
-                ).exists():
-                    messages.error(
-                        self.request,
-                        'This member already has an active loan for this book.'
-                    )
-                    return redirect('library:staff_loan_assign')
-
-                Loan.objects.create(member=member, book=book_locked)
-                book_locked.available_copies -= 1
-                book_locked.save(update_fields=['available_copies'])
-
+                _execute_checkout(member, book.pk)
+        except ValueError as exc:
+            messages.error(self.request, str(exc))
+            return redirect('library:staff_loan_assign')
         except IntegrityError:
             messages.error(
                 self.request,
@@ -254,27 +298,30 @@ class StaffForceReturnView(StaffRequiredMixin, View):
     def post(self, request, pk):
         try:
             with transaction.atomic():
-                loan = (
-                    Loan.objects
-                    .select_for_update()
-                    .select_related('book')
-                    .get(pk=pk, is_active=True)
-                )
-                book = Book.objects.select_for_update().get(pk=loan.book_id)
-
-                loan.is_active = False
-                loan.returned_at = timezone.now()
-                loan.save(update_fields=['is_active', 'returned_at'])
-
-                book.available_copies += 1
-                book.save(update_fields=['available_copies'])
-
+                loan = _execute_return(pk)
         except Loan.DoesNotExist:
-            from django.http import Http404
             raise Http404
 
         messages.success(
             request,
-            f'Loan for "{book.title}" by {loan.member.username} has been returned.'
+            f'Loan for "{loan.book.title}" by {loan.member.username} has been returned.'
         )
         return redirect('library:staff_loan_list')
+
+
+# ---------------------------------------------------------------------------
+# Staff Views — User Management
+# ---------------------------------------------------------------------------
+
+class StaffUserListView(StaffRequiredMixin, ListView):
+    model = User
+    template_name = 'library/staff/user_list.html'
+    context_object_name = 'members'
+
+    def get_queryset(self):
+        return (
+            User.objects
+            .filter(is_staff=False)
+            .annotate(active_loan_count=Count('loans', filter=Q(loans__is_active=True)))
+            .order_by('-date_joined')
+        )
