@@ -125,7 +125,7 @@ docker compose -f docker-compose.dev.yml exec web pytest -v
    ```dotenv
    SECRET_KEY=<generate-a-strong-random-key>
    DEBUG=False
-   ALLOWED_HOSTS=yourdomain.uz,www.yourdomain.uz,<server-ip>
+   ALLOWED_HOSTS=managelibrary.app,www.managelibrary.app,20.24.83.116
 
    DB_NAME=library_db
    DB_USER=library_user
@@ -138,7 +138,7 @@ docker compose -f docker-compose.dev.yml exec web pytest -v
    POSTGRES_PASSWORD=<strong-random-password>
    ```
 
-3. **Update `nginx/nginx.conf`** — replace all occurrences of `yourdomain.uz` with your actual domain.
+3. **Update `nginx/nginx.conf`** — replace all occurrences of `managelibrary.app` with your actual domain (already done if using this repo).
 
 4. **Start the production stack:**
    ```bash
@@ -150,7 +150,7 @@ docker compose -f docker-compose.dev.yml exec web pytest -v
    ```bash
    docker compose run --rm certbot certonly \
      --webroot -w /var/www/certbot \
-     -d yourdomain.uz -d www.yourdomain.uz
+      -d managelibrary.app -d www.managelibrary.app
    docker compose restart nginx
    ```
 
@@ -165,7 +165,7 @@ docker compose -f docker-compose.dev.yml exec web pytest -v
    docker compose exec web python manage.py populate_books
    ```
 
-8. **Verify** — visit `https://yourdomain.uz` in a browser.
+8. **Verify** — visit `https://managelibrary.app` in a browser.
 
 ### Zero-Downtime Redeployment
 
