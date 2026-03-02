@@ -157,7 +157,11 @@ if not DEBUG:
     # Required so SECURE_SSL_REDIRECT does not cause infinite redirect loops
     # when Django sits behind the Nginx reverse proxy.
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
+    # SECURE_SSL_REDIRECT is intentionally omitted — Nginx handles
+    # HTTP→HTTPS redirection in its port-80 server block, so Django
+    # does not need to duplicate it. Removing this also prevents 301
+    # loops during the initial SSL bootstrap (Phase 3.7 Phase A) when
+    # certs do not yet exist and traffic arrives over plain HTTP.
     SECURE_HSTS_SECONDS = 31_536_000          # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
