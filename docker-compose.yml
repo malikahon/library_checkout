@@ -1,8 +1,7 @@
 services:
 
-  # ---------------------------------------------------------------------------
   # Database — PostgreSQL 16
-  # ---------------------------------------------------------------------------
+
   db:
     image: postgres:16
     restart: unless-stopped
@@ -18,10 +17,9 @@ services:
     networks:
       - backend
 
-  # ---------------------------------------------------------------------------
   # Web — Django + Gunicorn
   # No host ports exposed; only reachable via nginx on the internal network.
-  # ---------------------------------------------------------------------------
+
   web:
     build:
       context: .
@@ -38,9 +36,8 @@ services:
     networks:
       - backend
 
-  # ---------------------------------------------------------------------------
   # Nginx — TLS termination, reverse proxy, static file serving
-  # ---------------------------------------------------------------------------
+
   nginx:
     image: nginx:alpine
     restart: unless-stopped
@@ -57,17 +54,13 @@ services:
     networks:
       - backend
 
-# ---------------------------------------------------------------------------
 # Named volumes
-# ---------------------------------------------------------------------------
 volumes:
   postgres_data:
   static_files:
   media_files:
 
-# ---------------------------------------------------------------------------
 # Networks — isolated bridge; only nginx is externally reachable
-# ---------------------------------------------------------------------------
 networks:
   backend:
     driver: bridge
