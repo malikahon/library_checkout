@@ -15,6 +15,7 @@ from .forms import AssignLoanForm, BookForm, RegistrationForm
 from .mixins import StaffRequiredMixin
 from .models import Book, Loan
 
+
 # auth
 class CustomLoginView(LoginView):
     template_name = 'registration/login.html'
@@ -26,13 +27,14 @@ class CustomLoginView(LoginView):
         )
         if redirect_to:
             return redirect_to
-        # staff users land on Manage Books 
+        # staff users land on Manage Books
         # members land on the catalogue
         if self.request.user.is_staff:
             return reverse_lazy('library:staff_book_list')
         return reverse_lazy('library:book_list')
 
-# helpers 
+
+# helpers
 def _execute_checkout(member, book_pk):
     book = Book.objects.select_for_update().get(pk=book_pk)
 
@@ -155,6 +157,7 @@ def my_loans_view(request):
         'past_loans': past_loans,
     })
 
+
 # staff views books
 class StaffBookListView(StaffRequiredMixin, ListView):
     model = Book
@@ -203,6 +206,7 @@ class StaffBookDeleteView(StaffRequiredMixin, DeleteView):
             return redirect('library:staff_book_list')
         messages.success(self.request, f'Book "{self.object.title}" has been deleted.')
         return super().form_valid(form)
+
 
 # staff views loans
 class StaffLoanListView(StaffRequiredMixin, ListView):
@@ -268,6 +272,7 @@ class StaffForceReturnView(StaffRequiredMixin, View):
             f'Loan for "{loan.book.title}" by {loan.member.username} has been returned.'
         )
         return redirect('library:staff_loan_list')
+
 
 # staff views users
 class StaffUserListView(StaffRequiredMixin, ListView):
