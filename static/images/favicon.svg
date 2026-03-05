@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Back cover -->
+  <path d="M14 8 C14 6, 16 4, 18 4 L48 4 C50 4, 52 6, 52 8 L52 56 C52 58, 50 60, 48 60 L18 60 C16 60, 14 58, 14 56 Z" fill="#0d3b2e"/>
+  <!-- Pages -->
+  <path d="M17 7 L49 7 L49 57 L17 57 Z" fill="#1a5c47"/>
+  <!-- Front cover -->
+  <path d="M12 6 C12 4, 14 2, 16 2 L46 2 C48 2, 50 4, 50 6 L50 54 C50 56, 48 58, 46 58 L16 58 C14 58, 12 56, 12 54 Z" fill="#145a3e"/>
+  <!-- Spine highlight -->
+  <path d="M12 6 C12 4, 14 2, 16 2 L19 2 L19 58 L16 58 C14 58, 12 56, 12 54 Z" fill="#0d3b2e"/>
+  <!-- Cover decoration — open book symbol -->
+  <path d="M24 20 L31 20 L31 44 L24 44 Z" fill="#2ecc88" opacity="0.5"/>
+  <path d="M33 20 L40 20 L40 44 L33 44 Z" fill="#2ecc88" opacity="0.5"/>
+  <path d="M31 20 L32 18 L33 20" fill="#2ecc88" opacity="0.5"/>
+  <!-- Cover line accents -->
+  <line x1="22" y1="48" x2="42" y2="48" stroke="#2ecc88" stroke-width="1.5" opacity="0.4"/>
+  <line x1="25" y1="51" x2="39" y2="51" stroke="#2ecc88" stroke-width="1" opacity="0.3"/>
+</svg>
