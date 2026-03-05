@@ -1,7 +1,7 @@
 #!/bin/sh
-# Generates a self-signed TLS certificate if one does not already exist.
-# Mount the ssl_certs volume to /etc/nginx/ssl in the nginx service.
-# Replace cert.pem and key.pem with real certificates for production use.
+# generates a self-signed TLS certificate 
+# mount the ssl_certs volume to /etc/nginx/ssl in the nginx service
+# replace cert.pem and key.pem with real certificates for production use
 
 SSL_DIR="/etc/nginx/ssl"
 CERT="$SSL_DIR/cert.pem"

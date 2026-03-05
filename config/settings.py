@@ -18,14 +18,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+# quick-start development settings - unsuitable for production
+# see https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
     raise ImproperlyConfigured(
@@ -33,14 +32,11 @@ if not SECRET_KEY:
         'Set it in your .env file or export it in your shell.'
     )
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
 ALLOWED_HOSTS = [h.strip() for h in ALLOWED_HOSTS if h.strip()]
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -50,7 +46,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Local apps
     'library.apps.LibraryConfig',
 ]
 
@@ -84,7 +79,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Database
+# db
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
@@ -99,7 +94,7 @@ DATABASES = {
 }
 
 
-# Password validation
+# pass validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -118,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
+# internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
@@ -130,37 +125,34 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+# static
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# Media files (user uploads)
+# media
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'mediafiles'
 
-# Authentication
+# auth
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
-# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ---------------------------------------------------------------------------
-# Production security hardening (applied only when DEBUG is off)
-# ---------------------------------------------------------------------------
+# when debug off
 if not DEBUG:
-    # Trust the X-Forwarded-Proto header set by Nginx.
-    # Required so SECURE_SSL_REDIRECT does not cause infinite redirect loops
+    # trust the X-Forwarded-Proto header set by Nginx
+    # required so SECURE_SSL_REDIRECT does not cause infinite redirect loops
     # when Django sits behind the Nginx reverse proxy.
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    # SECURE_SSL_REDIRECT is intentionally omitted — Nginx handles
-    # HTTP→HTTPS redirection in its port-80 server block, so Django
-    # does not need to duplicate it. Removing this also prevents 301
-    # loops during the initial SSL bootstrap (Phase 3.7 Phase A) when
+    # SECURE_SSL_REDIRECT is omitted (Nginx handles) HTTP→HTTPS redirection in its port-80 server block, so Django
+    # does not need to duplicate it. 
+    # removing this also prevents 301
+    # loops during the initial SSL bootstrap when
     # certs do not yet exist and traffic arrives over plain HTTP.
     SECURE_HSTS_SECONDS = 31_536_000          # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True

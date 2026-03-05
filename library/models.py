@@ -4,7 +4,6 @@ from django.db.models import Q
 
 
 class Genre(models.Model):
-    """A lookup/tag model used to categorise books."""
 
     name = models.CharField(max_length=100, unique=True)
 
@@ -17,8 +16,6 @@ class Genre(models.Model):
 
 
 class Book(models.Model):
-    """Represents an individual title in the library catalogue."""
-
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=200)
     isbn = models.CharField(max_length=13, unique=True, blank=True, null=True)
@@ -41,7 +38,6 @@ class Book(models.Model):
 
 
 class Loan(models.Model):
-    """Records a single lending transaction between a Member and a Book."""
 
     member = models.ForeignKey(
         settings.AUTH_USER_MODEL,

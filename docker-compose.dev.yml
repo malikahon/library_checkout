@@ -1,8 +1,6 @@
 services:
 
-  # ---------------------------------------------------------------------------
-  # Database — PostgreSQL 16 (separate volume from production)
-  # ---------------------------------------------------------------------------
+  # db — PostgreSQL 16 (separate volume from production)
   db:
     image: postgres:16
     restart: unless-stopped
@@ -22,9 +20,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # ---------------------------------------------------------------------------
-  # Web — Django development server with live code reload
-  # ---------------------------------------------------------------------------
+  # web — Django development server with live code reload
   web:
     build:
       context: .
@@ -36,15 +32,15 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
     volumes:
-      # Bind mount — changes to source code are reflected immediately
+      # bind mount, changes to source code are reflected immediately
       - .:/app
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
-    # Override the production entrypoint: run migrate then use Django's
-    # development server instead of Gunicorn (no collectstatic needed).
+    # override the production entrypoint: run migrate then use Django's
+    # dev server instead of Gunicorn (no collectstatic)
     entrypoint: []
     command: >
       sh -c "
@@ -52,8 +48,6 @@ services:
         python manage.py runserver 0.0.0.0:8000
       "
 
-# ---------------------------------------------------------------------------
-# Volumes — separate from production to avoid data conflicts
-# ---------------------------------------------------------------------------
+# volumes separate from production to avoid data conflicts
 volumes:
   postgres_data_dev:

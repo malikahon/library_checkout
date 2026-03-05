@@ -15,42 +15,25 @@ from .forms import AssignLoanForm, BookForm, RegistrationForm
 from .mixins import StaffRequiredMixin
 from .models import Book, Loan
 
-
-# ---------------------------------------------------------------------------
-# Authentication
-# ---------------------------------------------------------------------------
-
+# auth
 class CustomLoginView(LoginView):
     template_name = 'registration/login.html'
 
     def get_success_url(self):
-        # If there's an explicit ?next= parameter, honour it.
         redirect_to = self.request.POST.get(
             self.redirect_field_name,
             self.request.GET.get(self.redirect_field_name, ''),
         )
         if redirect_to:
             return redirect_to
-        # Staff users land on Manage Books; members land on the catalogue.
+        # staff users land on Manage Books 
+        # members land on the catalogue
         if self.request.user.is_staff:
             return reverse_lazy('library:staff_book_list')
         return reverse_lazy('library:book_list')
 
-
-# ---------------------------------------------------------------------------
-# Shared helpers
-# ---------------------------------------------------------------------------
-
+# helpers 
 def _execute_checkout(member, book_pk):
-    """Atomically create a loan and decrement available copies.
-
-    Must be called inside a ``transaction.atomic()`` block.
-
-    Returns the created ``Loan`` on success.
-    Raises ``Book.DoesNotExist`` if the book is missing.
-    Raises ``ValueError`` with a user-friendly message on business-rule
-    violations (no copies available, duplicate active loan).
-    """
     book = Book.objects.select_for_update().get(pk=book_pk)
 
     if book.available_copies <= 0:
@@ -66,17 +49,6 @@ def _execute_checkout(member, book_pk):
 
 
 def _execute_return(loan_pk, *, scope_filter=None):
-    """Atomically deactivate a loan and restore the book copy.
-
-    Must be called inside a ``transaction.atomic()`` block.
-
-    ``scope_filter`` is an optional dict of extra ``.get()`` kwargs
-    (e.g. ``{'member': request.user}``) used to restrict which loans
-    the caller is allowed to return.
-
-    Returns the deactivated ``Loan``.
-    Raises ``Loan.DoesNotExist`` if no matching active loan is found.
-    """
     lookup = {'pk': loan_pk, 'is_active': True}
     if scope_filter:
         lookup.update(scope_filter)
@@ -98,10 +70,7 @@ def _execute_return(loan_pk, *, scope_filter=None):
     return loan
 
 
-# ---------------------------------------------------------------------------
-# Public / Member Views
-# ---------------------------------------------------------------------------
-
+# public/member views
 def register_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -186,11 +155,7 @@ def my_loans_view(request):
         'past_loans': past_loans,
     })
 
-
-# ---------------------------------------------------------------------------
-# Staff Views — Book Management
-# ---------------------------------------------------------------------------
-
+# staff views books
 class StaffBookListView(StaffRequiredMixin, ListView):
     model = Book
     template_name = 'library/staff/book_list.html'
@@ -239,11 +204,7 @@ class StaffBookDeleteView(StaffRequiredMixin, DeleteView):
         messages.success(self.request, f'Book "{self.object.title}" has been deleted.')
         return super().form_valid(form)
 
-
-# ---------------------------------------------------------------------------
-# Staff Views — Loan Management
-# ---------------------------------------------------------------------------
-
+# staff views loans
 class StaffLoanListView(StaffRequiredMixin, ListView):
     model = Loan
     template_name = 'library/staff/loan_list.html'
@@ -308,11 +269,7 @@ class StaffForceReturnView(StaffRequiredMixin, View):
         )
         return redirect('library:staff_loan_list')
 
-
-# ---------------------------------------------------------------------------
-# Staff Views — User Management
-# ---------------------------------------------------------------------------
-
+# staff views users
 class StaffUserListView(StaffRequiredMixin, ListView):
     model = User
     template_name = 'library/staff/user_list.html'
