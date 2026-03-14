@@ -34,10 +34,11 @@
 
     --shadow-card: 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px var(--border);
     --shadow-glow: 0 0 16px rgba(16, 185, 129, 0.25);
+    --shadow-glow-purple: 0 0 28px rgba(168, 85, 247, 0.6);
     --transition:  0.18s ease;
 }
 
-/* ===== Base Reset & Typography ===== */
+/* ===== base reset & typography ===== */
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -109,7 +110,7 @@ nav {
     top: 0;
     z-index: 100;
     backdrop-filter: blur(8px);
-}
+} 
 
 .nav-brand {
     font-size: 1.15rem;
@@ -286,8 +287,10 @@ ul.messages li.info {
 }
 
 .book-card:hover {
-    border-color: var(--emerald-700);
-    box-shadow: 0 6px 28px rgba(0,0,0,0.5), 0 0 0 1px var(--emerald-700);
+    border-color: rgba(168, 85, 247, 0.7);
+    box-shadow: 0 6px 28px rgba(0,0,0,0.5),
+                0 0 0 1px rgba(168, 85, 247, 0.7),
+                0 0 28px rgba(168, 85, 247, 0.55);
     transform: translateY(-2px);
     text-decoration: none;
 }
